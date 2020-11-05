@@ -1,6 +1,7 @@
 package com.kmp.ecommerce.ecart.ViewHolder;
 
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +14,7 @@ import com.kmp.ecommerce.ecart.R;
 public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     public TextView txtProductName, txtProductPrice, txtProductQuantitity;
     public ImageView productImageView;
+    public Button remove_product_btn;
     private ItemClickListener itemClickListener;
 
     public CartViewHolder(@NonNull View itemView) {
@@ -21,6 +23,7 @@ public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         txtProductName = itemView.findViewById(R.id.cart_prod_name);
         txtProductQuantitity = itemView.findViewById(R.id.cart_prod_qty);
         productImageView = itemView.findViewById(R.id.cart_prod_item_image);
+        remove_product_btn = itemView.findViewById(R.id.remove_product_btn);
     }
 
     @Override
