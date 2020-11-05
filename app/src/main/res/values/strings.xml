@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">eCart</string>
+    <string name="app_slogan">Come Lets Buy!</string>
+    <string name="app_login">Login</string>
+    <string name="app_join">Join Now</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="password">Password</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forgot Password ?</string>
+    <string name="prompt_login">Already have an Account? Login!</string>
+    <string name="is_admin">I\'m an Admin?</string>
+    <string name="not_admin">Not an Admin?</string>
+
+    <string name="create_account">Create Account</string>
+    <string name="username">Name</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_cart">Cart</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_orders">Orders</string>
+    <string name="menu_categories">Categories</string>
+    <string name="title_activity_test_acivity">TestAcivity</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="plus">+</string>
+    <string name="minus">-</string>
+    <string name="initial_qty">1</string>
+    <string name="total_price">"Total Price = "</string>
+    <string name="next">Next</string>
+    <string name="product_name">Product Name</string>
+    <string name="product_quantity">Product Quantity</string>
+    <string name="product_price">Product Price</string>
+    <string name="your_phone_number">Your Phone Number...</string>
+    <string name="your_home_address">Your Home Address</string>
+    <string name="your_name">Your Name ...</string>
+    <string name="confirm">Confirm</string>
+    <string name="order_successfull">Congratulations your order is successfull!</string>
+    <string name="add_to_cart_lbl">Add to Cart</string>
+
+</resources>

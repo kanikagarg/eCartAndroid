@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "501294874125",
+    "firebase_url": "https://aman-aonepassion-cart.firebaseio.com",
+    "project_id": "aman-aonepassion-cart",
+    "storage_bucket": "aman-aonepassion-cart.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:501294874125:android:6fe2d2f1df9c65fd5ddf44",
+        "android_client_info": {
+          "package_name": "com.kmp.ecommerce.ecart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "501294874125-22jji6liaio719l185qrmetqgpgmhr8h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kmp.ecommerce.ecart",
+            "certificate_hash": "7151755f70ea85b1b682bc6dea2bb416a5814c94"
+          }
+        },
+        {
+          "client_id": "501294874125-02hou6ij3336hg41gh71fenhje3c1dos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQV0eXMCcN5FLVKkHHu24n10jeMu3a5xY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "501294874125-02hou6ij3336hg41gh71fenhje3c1dos.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
