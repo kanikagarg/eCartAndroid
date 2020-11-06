@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,20 +26,23 @@ import com.squareup.picasso.Picasso;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class ProductDetailedActivity extends AppCompatActivity {
 
     private  String productId = "";
     ImageView productImageView ;
-    TextView productName, prodDetailedDescription, prodDetailedPrice;//,itemQtyAddBtn, itemQtyMinusBtn;
-//    EditText itemQtyNum;
+    TextView productName, prodDetailedDescription, prodDetailedPrice;
     ElegantNumberButton quantityBtn;
     FloatingActionButton addToCartBtn;
+    private DatabaseReference cartListRef ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detailed);
+        cartListRef = FirebaseDatabase.getInstance().getReference().child("Cart List");
 
         productId = getIntent().getStringExtra("pid");
         productImageView = (ImageView)findViewById(R.id.product_detailed_image);
@@ -50,13 +52,6 @@ public class ProductDetailedActivity extends AppCompatActivity {
         quantityBtn = (ElegantNumberButton)findViewById(R.id.quantity_btn);
         addToCartBtn = (FloatingActionButton)findViewById(R.id.add_to_cart_btn);
 
-        addToCartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addProoductToCartList();
-            }
-        });
-
         getProductDetails(productId);
 
     }
@@ -65,6 +60,30 @@ public class ProductDetailedActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        addToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addProoductToCartList();
+            }
+        });
+
+        //To update the qty in Product Detailed Activity as per the qty added in the cart
+        cartListRef.child("User View").child(Prevalent.currentOnlineUser.getPhone()).child("Products").child(productId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+
+                            System.out.println("Quantity is :: "+snapshot.child("quantity").getValue());
+                            quantityBtn.setNumber((String) snapshot.child("quantity").getValue());
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(ProductDetailedActivity.this, "error in setting qty btn value:"+error    , Toast.LENGTH_SHORT).show();
+                    }
+                });
+
     }
 
     private void addProoductToCartList() {
@@ -72,7 +91,7 @@ public class ProductDetailedActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         currentDate =new SimpleDateFormat("DDMMYYYY").format(calendar.getTime());
         currentTime =new SimpleDateFormat("HH:MM:SS a").format(calendar.getTime());
-        final DatabaseReference cartListRef = FirebaseDatabase.getInstance().getReference().child("Cart List");
+        cartListRef = FirebaseDatabase.getInstance().getReference().child("Cart List");
         final HashMap<String,Object> cartMap = new HashMap<>();
         cartMap.put("pid",productId);
         cartMap.put("pName",productName.getText().toString());
@@ -124,6 +143,7 @@ public class ProductDetailedActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ProductDetailedActivity.this, "error in getting product details:"+error    , Toast.LENGTH_SHORT).show();
 
             }
         });

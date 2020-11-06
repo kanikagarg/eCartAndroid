@@ -1,7 +1,7 @@
 package com.kmp.ecommerce.ecart.Model;
 
 public class Cart {
-    private String pid, price, pName, discount, saveDate, saveTime, quantity, image;
+    private String pid, pName, price,  quantity, discount, image, saveDate, saveTime;
 
     public String getPid() {
         return pid;

@@ -5,6 +5,7 @@ public class Products {
     private String pname;
     private String price;
     private String quantity;
+    private String discount;
     private String description;
     private String category;
     private String image;
@@ -19,7 +20,6 @@ public class Products {
         this.discount = discount;
     }
 
-    private String discount;
 
     public String getPid() {
         return pid;

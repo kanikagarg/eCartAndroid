@@ -1,7 +1,6 @@
 package com.kmp.ecommerce.ecart;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,11 +24,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.annotations.NotNull;
 import com.kmp.ecommerce.ecart.Model.Cart;
 import com.kmp.ecommerce.ecart.Prevalent.Prevalent;
 import com.kmp.ecommerce.ecart.ViewHolder.CartViewHolder;
 import com.squareup.picasso.Picasso;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class CartActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -70,7 +71,7 @@ public class CartActivity extends AppCompatActivity {
             }
         });
 
-        txtTotalAmount.setText("Total Amount = Rs. " + String.valueOf(totalPrice));
+        txtTotalAmount.setText(getString(R.string.total_amt_equals, String.valueOf(totalPrice)));
     }
 
 
@@ -83,27 +84,74 @@ public class CartActivity extends AppCompatActivity {
                 new FirebaseRecyclerAdapter<Cart, CartViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull final CartViewHolder cartViewHolder, int i, @NonNull final Cart cart) {
-                cartViewHolder.txtProductQuantitity.setText("Quantity : " + cart.getQuantity().toString());
-                cartViewHolder.txtProductPrice.setText("Price : " + cart.getPrice().toString() + " Rs.");
-                cartViewHolder.txtProductName.setText("Product : " + cart.getpName().toString());
+                cartViewHolder.txtProductQuantitity.setText(getString(R.string.price_equals_lbl,cart.getQuantity()));
+                cartViewHolder.txtProductPrice.setText(getString(R.string.price_equals_lbl,cart.getPrice()));
+                cartViewHolder.txtProductName.setText(getString(R.string.product_name_equals_lbl,cart.getpName()));
                 Picasso.get().load(cart.getImage()).into(cartViewHolder.productImageView);
-                totalPrice += Integer.valueOf(cart.getQuantity()) * Integer.valueOf(cart.getPrice());
-                txtTotalAmount.setText("Total Amount = Rs. " + String.valueOf(totalPrice));
+                totalPrice += Integer.parseInt(cart.getQuantity()) * Integer.parseInt(cart.getPrice());
+                txtTotalAmount.setText(getString(R.string.total_amt_equals, String.valueOf(totalPrice)));
+                cartViewHolder.qtyBtn.setNumber(cart.getQuantity());
+                cartViewHolder.qtyBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        updateQtyinCart(cart.getPid(), cartViewHolder.qtyBtn.getNumber());
+                    }
+
+                    private void updateQtyinCart(final String pid,final String number) {
+
+                        String currentDate, currentTime;
+                        Calendar calendar = Calendar.getInstance();
+                        currentDate =new SimpleDateFormat("ddMMYYYY").format(calendar.getTime());
+                        currentTime =new SimpleDateFormat("hh:mm:ss az").format(calendar.getTime());
+                        final DatabaseReference cartListRef =
+                                FirebaseDatabase.getInstance().getReference().child("Cart List");
+                        cartListRef.child("User View").child(Prevalent.currentOnlineUser.getPhone())
+                                .child("Products").child(pid).child("quantity").setValue(number).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            cartListRef.child("Admin View")
+                                                    .child(Prevalent.currentOnlineUser.getPhone())
+                                                    .child("Products")
+                                                    .child(pid).child("quantity")
+                                                    .setValue(number).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                }
+                                            });
+                                        }
+
+                                    }
+                                });
+                            }
+                });
                 cartViewHolder.remove_product_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(CartActivity.this, "remove product", Toast.LENGTH_SHORT).show();
                         removeProductFromCart(cart.getPid());
                     }
                 });
+                //To update the qty in Cart as per the qty added in the cart
+                cartListRef.child(cart.getPid())
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    cartViewHolder.qtyBtn.setNumber((String) snapshot.child("quantity").getValue());
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                            }
+                        });
             }
 
             @NonNull
             @Override
             public CartViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cart_item_layout, parent, false);
-                CartViewHolder cartViewHolder = new CartViewHolder(view);
-                return cartViewHolder;
+                return  new CartViewHolder(view);
             }
         };
         recyclerView.setAdapter(adapter);

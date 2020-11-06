@@ -147,8 +147,6 @@ public class HomeActivity extends AppCompatActivity
                     @Override
                     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                        View view = LayoutInflater.from(parent.getContext() ).inflate(R.layout.product_items_layout, parent, false);
-//                       ProductViewHolder holder = new ProductViewHolder(view);
-//                       return holder;
                         return new ProductViewHolder(view);
                     }
                 };
@@ -228,18 +226,15 @@ public class HomeActivity extends AppCompatActivity
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
-                                               Toast.makeText(HomeActivity.this, R.string.product_add_to_cart_success_msg,Toast.LENGTH_SHORT).show();
-                                                System.out.println( R.string.product_add_to_cart_success_msg);
+                                               Toast.makeText(HomeActivity.this, getString(R.string.product_add_to_cart_success_msg),Toast.LENGTH_SHORT).show();
+                                                System.out.println( getString(R.string.product_add_to_cart_success_msg));
                                             }
-//                                            else{
-//                                                Toast.makeText(HomeActivity.this, "Product could not be added to cart!",Toast.LENGTH_SHORT).show();
-//                                            }
                                         }
                                     }).addOnFailureListener(new OnFailureListener(){
 
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(HomeActivity.this, R.string.product_add_to_cart_err+e.toString(),Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(HomeActivity.this, getString(R.string.product_add_to_cart_err,e.toString()),Toast.LENGTH_SHORT).show();
 
                                 }
                             });
