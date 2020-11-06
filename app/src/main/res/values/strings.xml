@@ -45,7 +45,10 @@
     <string name="order_successfull">Congratulations your order is successfull!</string>
     <string name="add_to_cart_lbl">Add to Cart</string>
     <string name="remove_product">x</string>
-    <string name="product_add_to_cart_err">Product could not be added to cart! Error :: </string>
+    <string name="product_add_to_cart_err">Product could not be added to cart! Error : %1$s </string>
     <string name="product_add_to_cart_success_msg">Product added successfully to cart!</string>
-    <string name="price_equals_lbl">Price = Rs. %1$s</string>
+    <string name="price_equals_lbl">Price : Rs. %1$s</string>
+    <string name="qty_equals_lbl">Quantity : %1$s</string>
+    <string name="product_name_equals_lbl">Product : %1$s</string>
+    <string name="total_amt_equals">Total Amount : Rs. %1$s</string>
 </resources>
