@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,31 +19,34 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.kmp.ecommerce.ecart.Model.Products;
 import com.kmp.ecommerce.ecart.Prevalent.Prevalent;
 import com.kmp.ecommerce.ecart.ViewHolder.ProductViewHolder;
-import com.kmp.ecommerce.ecart.utility.ProductUtility;
 import com.squareup.picasso.Picasso;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.paperdb.Paper;
 
-import static com.kmp.ecommerce.ecart.utility.ProductUtility.ADD_TO_CART_STATUS;
-
 public class HomeActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener{
     private DatabaseReference productsRef;
+    private DatabaseReference addToCartProductsRef;
     private RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
 
@@ -56,6 +58,9 @@ public class HomeActivity extends AppCompatActivity
 
         Paper.init(this);
         productsRef = FirebaseDatabase.getInstance().getReference().child("Products");
+        addToCartProductsRef = FirebaseDatabase.getInstance().getReference().child("Cart List")
+                .child("User View").child(Prevalent.currentOnlineUser.getPhone())
+                .child("Products");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Home");
@@ -104,24 +109,23 @@ public class HomeActivity extends AppCompatActivity
                     protected void onBindViewHolder(@NonNull final ProductViewHolder productViewHolder, int i, @NonNull final Products products) {
                         productViewHolder.txtProductName.setText(products.getPname());
                         productViewHolder.txtProductDescription.setText(products.getDescription());
-                        productViewHolder.txtProductPrice.setText("Price = Rs. "+products.getPrice());
+                        productViewHolder.txtProductPrice.setText(getString(R.string.price_equals_lbl,products.getPrice()));
                         Picasso.get().load(products.getImage()).into(productViewHolder.imageView);
 
-                        DatabaseReference addToCartRefQty = FirebaseDatabase.getInstance().getReference()
-                                .child("Cart List").child("User View").child(Prevalent.currentOnlineUser.getPhone());
-                        addToCartRefQty.child("Products").child(products.getPid())
+                        //To update the qty in home screen as per the qty added in the cart
+                        addToCartProductsRef.child(products.getPid())
                                 .addValueEventListener(new ValueEventListener() {
                                  @Override
                                  public void onDataChange(@NonNull DataSnapshot snapshot) {
                                      if (snapshot.exists()) {
-                                         productViewHolder.qtyItemBtn.setNumber(snapshot.child("quantity").getValue().toString());
-//                                         ProductUtility.qtyInCart = snapshot.child("quantity").getValue().toString();
+                                         productViewHolder.qtyItemBtn.setNumber((String) snapshot.child("quantity").getValue());
                                      }
                                  }
                                  @Override
                                  public void onCancelled(@NonNull DatabaseError error) {
                                  }});
 
+                        //To show detailed Product on click
                         productViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -130,30 +134,12 @@ public class HomeActivity extends AppCompatActivity
                                 startActivity(intent);
                             }
                         });
-                        productViewHolder.qtyItemBtn.setOnValueChangeListener(new ElegantNumberButton.OnValueChangeListener() {
-                            @Override
-                            public void onValueChange(ElegantNumberButton view, int oldValue, int newValue) {
-//                                System.out.println("Need to write code for updating quantity in cart");
-                            }
-                        });
+
+                        //To add product to the cart on click of add to cart button for that product
                         productViewHolder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                            //code to add this product to the cart
-                                ProductUtility.addProoductToCartList(products, Integer.valueOf(productViewHolder.qtyItemBtn.getNumber()));
-                                System.out.println("Add to cart status ::"+ADD_TO_CART_STATUS+"Before handler");
-                                final Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        System.out.println("After 5 sec Add to cart status ::"+ADD_TO_CART_STATUS);
-                                        if ( ADD_TO_CART_STATUS){
-                                            Toast.makeText(HomeActivity.this, "Product Added to Cart Successfully", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(HomeActivity.this, "Could not add your product to cart, some Error occured. Please try again...", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                }, 5000);
+                                addProoductToCartList(products, productViewHolder.qtyItemBtn.getNumber());
                             }
                         });
                     }
@@ -161,8 +147,9 @@ public class HomeActivity extends AppCompatActivity
                     @Override
                     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                        View view = LayoutInflater.from(parent.getContext() ).inflate(R.layout.product_items_layout, parent, false);
-                       ProductViewHolder holder = new ProductViewHolder(view);
-                       return holder;
+//                       ProductViewHolder holder = new ProductViewHolder(view);
+//                       return holder;
+                        return new ProductViewHolder(view);
                     }
                 };
         recyclerView.setAdapter(adapter);
@@ -188,6 +175,9 @@ public class HomeActivity extends AppCompatActivity
             startActivity(intent);
         }else if(id == R.id.nav_orders){
 
+            Intent intent = new Intent(HomeActivity.this, UserOrdersActivity.class);
+            startActivity(intent);
+
         }else if(id == R.id.nav_settings){
             Intent intent = new Intent(HomeActivity.this, SettingsActivity.class);
             startActivity(intent);
@@ -205,6 +195,56 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+    public void addProoductToCartList(final Products product, String qty) {
+        String currentDate, currentTime;
+        Calendar calendar = Calendar.getInstance();
+        currentDate =new SimpleDateFormat("ddMMYYYY").format(calendar.getTime());
+        currentTime =new SimpleDateFormat("hh:mm:ss az").format(calendar.getTime());
+        final DatabaseReference cartListRef =
+                FirebaseDatabase.getInstance().getReference().child("Cart List");
+        final HashMap<String,Object> cartMap = new HashMap<>();
+        cartMap.put("pid",product.getPid());
+        cartMap.put("pName",product.getPname());
+        cartMap.put("price",product.getPrice());
+        cartMap.put("description",product.getDescription());
+        cartMap.put("date",currentDate);
+        cartMap.put("time",currentTime);
+        cartMap.put("image",product.getImage());
+        cartMap.put("quantity",qty);
+        cartMap.put("discount",product.getDiscount());
+        cartListRef.child("User View").child(Prevalent.currentOnlineUser.getPhone())
+                .child("Products").child(product.getPid())
+                .updateChildren(cartMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            cartListRef.child("Admin View")
+                                    .child(Prevalent.currentOnlineUser.getPhone())
+                                    .child("Products")
+                                    .child(product.getPid())
+                                    .updateChildren(cartMap)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                               Toast.makeText(HomeActivity.this, R.string.product_add_to_cart_success_msg,Toast.LENGTH_SHORT).show();
+                                                System.out.println( R.string.product_add_to_cart_success_msg);
+                                            }
+//                                            else{
+//                                                Toast.makeText(HomeActivity.this, "Product could not be added to cart!",Toast.LENGTH_SHORT).show();
+//                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener(){
 
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(HomeActivity.this, R.string.product_add_to_cart_err+e.toString(),Toast.LENGTH_SHORT).show();
 
+                                }
+                            });
+                        }
+                    }
+                });
+    }
 }

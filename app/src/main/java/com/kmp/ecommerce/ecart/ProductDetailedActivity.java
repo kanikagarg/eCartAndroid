@@ -61,6 +61,12 @@ public class ProductDetailedActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
     private void addProoductToCartList() {
         String currentDate, currentTime;
         Calendar calendar = Calendar.getInstance();

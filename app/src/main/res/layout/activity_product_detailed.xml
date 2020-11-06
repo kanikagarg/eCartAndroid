@@ -52,7 +52,7 @@
         android:layout_height="20dp"
         android:layout_width="80dp"
         android:elevation="6dp"
-        app:initialNumber="1"
+        app:initialNumber="0"
         app:textColor="@android:color/white"
         android:textSize="16sp"
         app:finalNumber="10"
